@@ -3,6 +3,8 @@ import { SITE } from '../config/site.js';
 import { getTracking } from '../utils/tracking.js';
 
 const URL = import.meta.env.VITE_LEAD_WEBHOOK_URL;
+const KEY = import.meta.env.VITE_MAKE_API_KEY;
+
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 export class SubmitError extends Error {
   constructor(msg, { retryable = true } = {}) { super(msg); this.retryable = retryable; }
@@ -35,7 +37,7 @@ export async function submitLead(payload, { retries = 2, timeoutMs = 10000 } = {
     try {
       const res = await fetch(URL, {
         method: 'POST', signal: ctrl.signal,
-        headers: { 'Content-Type': 'application/json', 'Idempotency-Key': payload.metadata.leadId },
+        headers: { 'Content-Type': 'application/json', 'Idempotency-Key': payload.metadata.leadId,  'X-Make-ApiKey': KEY },
         body: JSON.stringify(payload),
       });
       if (res.ok) return { ok: true }; // only a 2xx counts as "stored"
